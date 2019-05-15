@@ -1,0 +1,35 @@
+.item {
+    width: 100%;
+}
+
+.item img {
+    width: 5%;
+    vertical-align: middle;
+    margin-right: 1%;
+}
+
+.item img:before {
+    content: ' ';
+}
+
+.boldLbl{
+    font-size: 110%;
+}
+
+@media only screen and (max-width: 950px) {
+    .boldLbl{
+        font-size: 90%;
+    }
+    .item img {
+        width: 6%;
+    }
+}
+
+@media only screen and (max-width: 400px) {
+    .boldLbl{
+        font-size: 80%;
+    }
+    .item img {
+        width: 8%;
+    }
+}

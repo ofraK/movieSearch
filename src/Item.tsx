@@ -1,13 +1,15 @@
 import React from 'react';
+import './Item.css';
+
+import BoldLabel from './BoldLabel'
 
 
-function Item(props: {imageUrl: string, itemName: string}){
-    const myAlt = "image of "+props.itemName
+function Item(props: {imageUrl: string, itemName: string, itemBold:string}){
     return (
-        <span>
-            <img src={props.imageUrl} alt={myAlt}/>
-            <label>{props.itemName}</label>
-        </span>
+        <div className="item">
+            <img src={props.imageUrl} alt={" "}/>
+            <BoldLabel text={props.itemName} toBold={props.itemBold}/>
+        </div>
     );
 }
 

@@ -1,69 +1,137 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-
 import './App.css';
 import Movies from './MoviesList';
+import Error from './Error'
+import Message from './Message'
 
+class App extends React.Component<{},{disButton: boolean} > {
+    static searchId  = 0; //for making sure fetches are on the right order
+    static currentSearch = { // for consistant page loading
+        page: 0,
+        str: "",
+        movies: []
+    };
 
-class App extends React.Component {
-  constructor() {
-    super({});
-    //this.handleSearchChange = this.handleSearchChange.bind(this);
-  }
+    constructor(props: any) {
+        super(props);
+        this.state = {
+            disButton: true
+        };
+        this.extractMovies = this.extractMovies.bind(this);
+        this.updateSearchResult = this.updateSearchResult.bind(this);
+        this.getImdbInfo = this.getImdbInfo.bind(this);
+        this.handleSearchChange = this.handleSearchChange.bind(this);
+        this.loadMoreMovies = this.loadMoreMovies.bind(this);
+    }
 
-  static handleSearchChange(event: React.FormEvent<HTMLInputElement>) {
-    let userInput = (event.currentTarget as HTMLInputElement).value;
-    //ask imdb
-    fetch("http://www.omdbapi.com/?apikey=b239a988&s=*"+userInput+"*&type=movie&page=1")
-        .then(res => res.json())
-        .then(result => {
-          console.log(result);
-          if(result.Response == "False"){
-            return;
-          }else{
-            let miniResults: {name: string, image: string}[];
-            miniResults = [];
-            result.Search.map((movie:any) => miniResults.push({name: movie.Title, image: movie.Poster}));
+    //get relevant details from imdb returned movies
+    extractMovies(imdbMovies: any, str: string): ({name: string, image: string}[]) {
+        let movies: {name: string, image: string}[];
+        movies = [];
+        imdbMovies.Search.forEach((movie: any) => {
+            if (movie.Title.toLowerCase().includes(str.toLowerCase()))
+                movies.push({name: movie.Title, image: movie.Poster})
+        });
+        return movies;
+    }
+
+    //updates the results according to user's input
+    updateSearchResult(element: React.ReactElement, id: number, page: number, str: string): void {
+        if (id === App.searchId) {
+            App.currentSearch.page = page+1;
+            App.currentSearch.str = str;
+            let buttonStatus = true;
+            if (element.props.moviesInfo !== undefined){
+                buttonStatus = false;
+
+                App.currentSearch.movies = element.props.moviesInfo;
+            }
+            this.setState({
+                disButton: buttonStatus
+            });
             ReactDOM.render(
-                <Movies moviesInfo={miniResults} />,
+                element,
                 document.getElementById('searchResults')
-            );}
-          }
-          //let results = {"Search":[{"Title":"World War Z","Year":"2013","imdbID":"tt0816711","Type":"movie","Poster":"https://m.media-amazon.com/images/M/MV5BNDQ4YzFmNzktMmM5ZC00MDZjLTk1OTktNDE2ODE4YjM2MjJjXkEyXkFqcGdeQXVyNTA4NzY1MzY@._V1_SX300.jpg"},{"Title":"Jurassic World","Year":"2015","imdbID":"tt0369610","Type":"movie","Poster":"https://m.media-amazon.com/images/M/MV5BNzQ3OTY4NjAtNzM5OS00N2ZhLWJlOWUtYzYwZjNmOWRiMzcyXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SX300.jpg"},{"Title":"Thor: The Dark World","Year":"2013","imdbID":"tt1981115","Type":"movie","Poster":"https://m.media-amazon.com/images/M/MV5BMTQyNzAwOTUxOF5BMl5BanBnXkFtZTcwMTE0OTc5OQ@@._V1_SX300.jpg"},{"Title":"The Lost World: Jurassic Park","Year":"1997","imdbID":"tt0119567","Type":"movie","Poster":"https://m.media-amazon.com/images/M/MV5BMDFlMmM4Y2QtNDg1ZS00MWVlLTlmODgtZDdhYjY5YjdhN2M0XkEyXkFqcGdeQXVyNTI4MjkwNjA@._V1_SX300.jpg"},{"Title":"Scott Pilgrim vs. the World","Year":"2010","imdbID":"tt0446029","Type":"movie","Poster":"https://m.media-amazon.com/images/M/MV5BMTkwNTczNTMyOF5BMl5BanBnXkFtZTcwNzUxOTUyMw@@._V1_SX300.jpg"},{"Title":"Jurassic World: Fallen Kingdom","Year":"2018","imdbID":"tt4881806","Type":"movie","Poster":"https://m.media-amazon.com/images/M/MV5BNzIxMjYwNDEwN15BMl5BanBnXkFtZTgwMzk5MDI3NTM@._V1_SX300.jpg"},{"Title":"Master and Commander: The Far Side of the World","Year":"2003","imdbID":"tt0311113","Type":"movie","Poster":"https://m.media-amazon.com/images/M/MV5BMjA5NjYyMDM5NV5BMl5BanBnXkFtZTYwOTU5MDY2._V1_SX300.jpg"},{"Title":"The World Is Not Enough","Year":"1999","imdbID":"tt0143145","Type":"movie","Poster":"https://m.media-amazon.com/images/M/MV5BMjA0MzUyNjg0MV5BMl5BanBnXkFtZTcwNDY5MDg0NA@@._V1_SX300.jpg"},{"Title":"Team America: World Police","Year":"2004","imdbID":"tt0372588","Type":"movie","Poster":"https://m.media-amazon.com/images/M/MV5BMTM2Nzc4NjYxMV5BMl5BanBnXkFtZTcwNTM1MTcyMQ@@._V1_SX300.jpg"},{"Title":"Wayne's World","Year":"1992","imdbID":"tt0105793","Type":"movie","Poster":"https://m.media-amazon.com/images/M/MV5BMDAyNDY3MjUtYmJjYS00Zjc5LTlhM2MtNzgzYjNlOWVkZjkzL2ltYWdlL2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg"}],"totalResults":"5322","Response":"True"}
+            );
+        }
 
-       )
+    }
 
-  }
+    //get movies from imdb, from page 'pageNum' to 'maxPage'. increase maxPage if returned info isn't sufficient
+    //returns: callback for next page or render element if done
+    getImdbInfo(search: string, originalSearch: string, pageNum: number, maxPage: number, movies: any[], id: number): any {
+        return fetch("http://www.omdbapi.com/?apikey=b239a988&s=*" + search + "*&type=movie&page=" + pageNum)
+            .then(res => res.json())
+            .then(result => {
+                if (id !== App.searchId) {
+                    return;
+                }
+                if (result.Response === "False") {
+                    this.updateSearchResult((<Error message={result.Error}/>), id, pageNum, originalSearch);
+                    return;
+                } else {
+                    let newMovies = this.extractMovies(result, originalSearch);
+                    if (newMovies.length > 0) {
+                        movies = movies.concat(newMovies);
+                    }
+                    if (newMovies.length < 5 || movies.length < 8) {
+                        maxPage += 1;
+                    }
+                    let totalResults = parseInt(result.totalResults);
+                    if (pageNum !== maxPage && pageNum < 100 && totalResults / 10 > pageNum)
+                        return this.getImdbInfo(search, originalSearch, pageNum + 1, maxPage, newMovies, id);
+                    else {
+                        if (movies.length === 0) {
+                            this.updateSearchResult((<Message message={'Movie not found!'}/>), id, pageNum, originalSearch);
+                            return;
+                        }
+                        this.updateSearchResult((<Movies moviesInfo={movies} specialWord={originalSearch}/>), id, pageNum, originalSearch)
+                    }
+                }
+            });
+    }
 
-  render() {
-    return (
-        <div id="main">
-          <div id="search">
-            <input type="text" onChange={App.handleSearchChange}/>
-          </div>
-          <div id="searchResults">
-          </div>
-        </div>
-    );
+    //handles space - problem with imdb api
+    static convertInput(input: string): string {
+        return input.trim().replace(" ", "+");
+    }
 
+    //activates when user changes input
+    handleSearchChange(event: React.FormEvent<HTMLInputElement>): void {
+        let userInput = (event.currentTarget as HTMLInputElement).value;
+        if (userInput === "") {
+            return;
+        }
+        App.searchId += 1;
+        let myId = App.searchId;
+        let replaceSpace = App.convertInput(userInput);
+        this.getImdbInfo(replaceSpace, userInput, 1, 1, [], myId);
+        this.updateSearchResult((<Message message={'Searching...'}/>), myId, 0, userInput);
+    }
 
-  }
+    loadMoreMovies(): void{
+        this.getImdbInfo(App.convertInput(App.currentSearch.str), App.currentSearch.str,
+            App.currentSearch.page, App.currentSearch.page,
+            App.currentSearch.movies, App.searchId);
+    }
+
+    render() {
+        return (
+            <div id="main">
+                <div id="search">
+                    <input type="text" onChange={this.handleSearchChange} placeholder="Search..."/>
+                    <span id="loader">
+                        <button disabled={this.state.disButton} onClick={this.loadMoreMovies}>load more</button>
+                    </span>
+                </div>
+                <div id="searchResults">
+                </div>
+            </div>
+        );
+    }
 }
 
-/*
-const App = () => {
-
-  return (
-    <div id="main">
-      <div id="search">
-        <input type="text" onChange={Movies.updateMovies}/>
-      </div>
-      <div id="searchResults">
-      </div>
-    </div>
-  );
-};
-*/
 export default App;
 
 

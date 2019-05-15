@@ -1,0 +1,20 @@
+#main {
+    margin: 1% 10%;
+    height: 95%;
+    position: absolute;
+    overflow-y: hidden;
+    width: 80%;
+
+}
+
+#search input {
+    width: 60%;
+}
+
+#search button {
+    margin: 0 1%;
+}
+
+#search {
+    margin: 1% 0;
+}

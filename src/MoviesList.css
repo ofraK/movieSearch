@@ -1,0 +1,12 @@
+.moviesList {
+    list-style-type: none;
+    padding: 0;
+    height: 95%;
+    overflow-y: auto;
+    position: absolute;
+    width: 100%;
+}
+
+.moviesList li {
+    margin: 1% 0;
+}
