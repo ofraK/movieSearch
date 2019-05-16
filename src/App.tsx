@@ -74,12 +74,12 @@ class App extends React.Component<{},{disButton: boolean} > {
                     if (newMovies.length > 0) {
                         movies = movies.concat(newMovies);
                     }
-                    if (newMovies.length < 5 || movies.length < 8) {
+                    if (newMovies.length < 2 || movies.length < 8) {
                         maxPage += 1;
                     }
                     let totalResults = parseInt(result.totalResults);
                     if (pageNum !== maxPage && pageNum < 100 && totalResults / 10 > pageNum)
-                        return this.getImdbInfo(search, originalSearch, pageNum + 1, maxPage, newMovies, id);
+                        return this.getImdbInfo(search, originalSearch, pageNum + 1, maxPage, movies, id);
                     else {
                         if (movies.length === 0) {
                             this.updateSearchResult((<Error message={'Movie not found!'}/>), id, pageNum, originalSearch);
