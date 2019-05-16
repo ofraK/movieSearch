@@ -2,13 +2,13 @@ import React from 'react';
 import './MoviesList.css';
 import Item from './Item';
 
-interface MoviesInformation {
+interface IMoviesInformation {
     moviesInfo: {name: string, image: string}[],
     specialWord: string
 }
 
 
-export default class Movies extends React.Component<MoviesInformation> {
+export default class Movies extends React.Component<IMoviesInformation> {
 
     render(){
         return (

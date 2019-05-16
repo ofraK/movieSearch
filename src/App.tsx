@@ -44,12 +44,11 @@ class App extends React.Component<{},{disButton: boolean} > {
             let buttonStatus = true;
             if (element.props.moviesInfo !== undefined){
                 buttonStatus = false;
-
                 App.currentSearch.movies = element.props.moviesInfo;
             }
             this.setState({
                 disButton: buttonStatus
-            });
+            })
             ReactDOM.render(
                 element,
                 document.getElementById('searchResults')
@@ -83,7 +82,7 @@ class App extends React.Component<{},{disButton: boolean} > {
                         return this.getImdbInfo(search, originalSearch, pageNum + 1, maxPage, newMovies, id);
                     else {
                         if (movies.length === 0) {
-                            this.updateSearchResult((<Message message={'Movie not found!'}/>), id, pageNum, originalSearch);
+                            this.updateSearchResult((<Error message={'Movie not found!'}/>), id, pageNum, originalSearch);
                             return;
                         }
                         this.updateSearchResult((<Movies moviesInfo={movies} specialWord={originalSearch}/>), id, pageNum, originalSearch)

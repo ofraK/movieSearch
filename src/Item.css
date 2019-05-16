@@ -2,15 +2,23 @@
     width: 100%;
 }
 
+.item:hover{
+    background-color: #d4e1e8b0;
+    border-radius: 10px;
+}
+
 .item img {
     width: 5%;
     vertical-align: middle;
     margin-right: 1%;
 }
 
-.item img:before {
-    content: ' ';
+.item div{
+    width: 70%;
+    display: inline-block;
+    vertical-align: middle;
 }
+
 
 .boldLbl{
     font-size: 110%;
@@ -21,15 +29,8 @@
         font-size: 90%;
     }
     .item img {
-        width: 6%;
+        width: 50px;
     }
 }
 
-@media only screen and (max-width: 400px) {
-    .boldLbl{
-        font-size: 80%;
-    }
-    .item img {
-        width: 8%;
-    }
-}
+

@@ -13,6 +13,13 @@
 
 #search button {
     margin: 0 1%;
+    outline:0;
+
+}
+
+#search button:hover{
+    background: #e1eaee;
+    outline:0;
 }
 
 #search {
